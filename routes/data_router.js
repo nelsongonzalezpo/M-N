@@ -31,7 +31,7 @@ data_router.post('/specificQR', async (req, res) => {
 })
 
 })
-
+ 
 
 //Returns base64 from any shit
 function convertirQR(data) {
