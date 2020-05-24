@@ -19,7 +19,7 @@ data_router.get('/getQR', (req, res) => {
 
 //get base64 from specificShit
 data_router.post('/specificQR', async (req, res) => {
- Data.findOne({ description: req.body.description }, (error, docs) => {
+ Data.findOne({ name: req.body.name }, (error, docs) => {
      let base64 = convertirQR(docs)
          
      base64.then((value) => {
@@ -38,7 +38,6 @@ function convertirQR(data) {
 
     let base64 = QRCode.toDataURL(JSON.stringify(data))
         .then(url => {
-            // console.log("la infoo " + url)
             return url
         })
         .catch(err => {
@@ -52,19 +51,44 @@ function convertirQR(data) {
 
 
 //Post new Shit
-data_router.post('/data', (req, res) => {
+data_router.post('/dataPost', (req, res) => {
+    let dateOfBirth = req.body.dateOfBirth;
+    let usableDate = moment(dateOfBirth, "DD-MM-YYYY"); 
+
     (new Data
         ({
-            'title': req.body.title,
-            'description': req.body.description,
-            'moreDescription': req.body.moreDescription,
-            'final': req.body.final,
+            'name': req.body.name,
+            'placeOfBirth': req.body.placeOfBirth,
+            'bloodType': req.body.bloodType,
+            'weight': req.body.weight,
+            'weightPounds': getPounds(req.body.weight),
+            'height': req.body.height,
+            'emergencyName': req.body.emergencyName,
+            'emergencyNumber': req.body.emergencyNumber,
+            'dateOfBirth': req.body.dateOfBirth,
+            'age': getAge(usableDate),
         }))
         .save()
         .then((data) => res.send(data))
         .catch((error) => console.log(error));
 
 })
+
+//Remove "years ago" w regex
+function getAge(date) { 
+
+    const age = moment().diff(date, 'years');
+    let edad = moment(date, "DD-MM-YYYY").fromNow();
+
+    return edad;
+
+}
+
+function getPounds(weight) { 
+
+    return weight * 2.2
+
+}
 
 
 module.exports = data_router;
